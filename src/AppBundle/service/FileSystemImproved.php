@@ -54,9 +54,9 @@ class FileSystemImproved
     }
 
     /**
-     * @Route("/write-in-file/{filename}/{text}/{offset?}", name="writefile")
+     * @Route("/write-in-file/{filename}/{text}", name="writefile")
      */
-    public function writeInFile($filename, $text, $offset)
+    public function writeInFile($filename, $text)
     { // init file system
         $fsObject = new Filesystem();
         $current_dir_path = getcwd();
@@ -66,7 +66,7 @@ class FileSystemImproved
 
             if ($fsObject->exists($file_path)) {
                 $fsObject->chmod($file_path, 0777);
-                $fsObject->appendToFile($file_path, $text, $offset);
+                $fsObject->appendToFile($file_path, $text);
             }
         } catch (IOExceptionInterface $exception) {
             echo "Error creating file at" . $exception->getPath();
@@ -113,13 +113,13 @@ class FileSystemImproved
                 $finder->files()->in($current_dir_path . "/fsi");
                 foreach ($finder as $file) {
                     $contents = $file->getContents();
-                    //  print($contents);
+                    print($contents);
                 }
             }
         } catch (IOExceptionInterface $exception) {
             echo "Error creating file at" . $exception->getPath();
         }
-        return new JsonResponse(json_encode($contents));
+        // return new JsonResponse(json_encode($contents));
         // return $this->render('default/test.html.twig');
         return new Response('<html><h1>read</h1></html>');
     }
