@@ -30,9 +30,31 @@ class FileSystemImproved
             echo "Error creating directory at" . $exception->getPath();
         }
     }
-    /**
-     * @Route("/create-file/{filename}", name="createfile")
-     */
+
+    public function allfiles()
+    {
+        $fsObject = new Filesystem();
+        $current_dir_path = getcwd();
+        $finder = new Finder();
+        // find all files in the current directory
+        $test = $finder->files()->in($current_dir_path . '/fsi');
+
+        $l = iterator_to_array($test);
+        //var_dump($l);
+        //  foreach ($l as $key => $value)
+        //      echo $value;
+        // check if there are any search results
+        if ($finder->hasResults()) {
+            echo 'Files in this folder: ';
+        }
+        foreach ($finder as $file) {
+            // $absoluteFilePath = $file->getRealPath();
+            $fileNameWithExtension = $file->getRelativePathname();
+            //$l =  print();
+        }
+        return new JsonResponse(json_encode($fileNameWithExtension));
+        //return new Response('<html><h1>created</h1></html>');
+    }
     public function createFile($filename)
     {
         // init file system
@@ -53,9 +75,6 @@ class FileSystemImproved
         return new Response('<html><h1>created</h1></html>');
     }
 
-    /**
-     * @Route("/write-in-file/{filename}/{text}", name="writefile")
-     */
     public function writeInFile($filename, $text)
     { // init file system
         $fsObject = new Filesystem();
@@ -65,7 +84,10 @@ class FileSystemImproved
             $file_path = $current_dir_path . "/fsi/" . $filename;
 
             if ($fsObject->exists($file_path)) {
-                $fsObject->chmod($file_path, 0777);
+                //$fsObject->chmod($file_path, 0777);
+                //  $fsObject = fopen($file_path, 'r');
+                //  fseek($fsObject, 0);
+                //  fwrite($file_path, $text);
                 $fsObject->appendToFile($file_path, $text);
             }
         } catch (IOExceptionInterface $exception) {
@@ -73,9 +95,7 @@ class FileSystemImproved
         }
         return new Response('<html><h1>write</h1></html>');
     }
-    /**
-     * @Route("/delete-file/{filename}", name="deletefile")
-     */
+
     public function deleteFile($filename)
     { // init file system
         $fsObject = new Filesystem();
@@ -88,17 +108,16 @@ class FileSystemImproved
                 $fsObject->chmod($file_path, 0777);
                 // $filename = iterator_to_array($filename, false);
                 $fsObject->remove($file_path);
-            }
+                $resp = true;
+                // echo " true";
+            } else  $resp = false;
         } catch (IOExceptionInterface $exception) {
             echo "Error creating file at" . $exception->getPath();
         }
-
-        return new Response('<html><h1>deleted</h1></html>');
+        return new JsonResponse(json_encode($resp));
+        // return new Response('<html><h1>deleted</h1></html>');
     }
 
-    /**
-     * @Route("/read-file/{filename}", name="readfile")
-     */
     public function readFile($filename)
     { // init file system
         $fsObject = new Filesystem();
@@ -119,7 +138,7 @@ class FileSystemImproved
         } catch (IOExceptionInterface $exception) {
             echo "Error creating file at" . $exception->getPath();
         }
-        // return new JsonResponse(json_encode($contents));
+        return new JsonResponse(json_encode($contents));
         // return $this->render('default/test.html.twig');
         return new Response('<html><h1>read</h1></html>');
     }
